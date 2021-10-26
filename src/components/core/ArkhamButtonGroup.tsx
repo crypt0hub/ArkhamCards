@@ -33,16 +33,21 @@ export function SingleButton({ idx, content, last, onPressIndex, height, selecte
     <>
       <Ripple
         onPress={onPress}
-        rippleColor={colors.L20}
         style={[
           styles.button,
-          { height: height - 2, backgroundColor: selected ? colors.L15 : colors.L30 },
+          { height, backgroundColor: selected ? colors.L10 : colors.M },
           idx === 0 ? { borderTopLeftRadius: height / 2, borderBottomLeftRadius: height / 2 } : {},
           last ? { borderBottomRightRadius: height / 2, borderTopRightRadius: height / 2 } : {},
         ]}
       >
         { content.element(selected) }
       </Ripple>
+      { !last && (
+        <View
+          key={`divider-${idx}`}
+          style={[styles.divider, { marginLeft: -1.5, height: height - 16, backgroundColor: colors.L10 }]}
+        />
+      ) }
     </>
   );
 }
@@ -52,7 +57,7 @@ export default function ArkhamButtonGroup({
   selectedIndexes,
   onPress,
 }: Props) {
-  const { colors, fontScale } = useContext(StyleContext);
+  const { colors, fontScale, shadow } = useContext(StyleContext);
   const [localSelectedIndexes, setLocalSelectedIndexes] = useState(selectedIndexes);
   useEffectUpdate(() => {
     setLocalSelectedIndexes(selectedIndexes);
@@ -64,10 +69,10 @@ export default function ArkhamButtonGroup({
     InteractionManager.runAfterInteractions(() => onPress(newSelection));
   }, [selectedIndexes, setLocalSelectedIndexes, onPress]);
   const selection = useMemo(() => new Set(localSelectedIndexes), [localSelectedIndexes]);
-  const height = 28 * fontScale + 20;
+  const height = 18 * fontScale + 20;
   return (
     <View style={styles.wrapper}>
-      <View style={[styles.buttonWrapper, { borderColor: colors.M, borderRadius: height / 2, height, backgroundColor: colors.L30 }]}>
+      <View style={[styles.buttonWrapper, shadow.medium, { borderRadius: height / 2, height, backgroundColor: colors.M }]}>
         { map(buttons, (button, idx) => {
           const last = idx === (buttons.length - 1);
           return (
@@ -93,13 +98,16 @@ const styles = StyleSheet.create({
   buttonWrapper: {
     flexDirection: 'row',
     alignItems: 'center',
-    borderWidth: StyleSheet.hairlineWidth,
   },
   button: {
     flex: 1,
-    padding: 10,
+    paddingTop: 10,
+    paddingBottom: 10,
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  divider: {
+    width: 1,
   },
 });

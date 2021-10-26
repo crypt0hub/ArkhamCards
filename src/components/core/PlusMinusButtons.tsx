@@ -1,4 +1,4 @@
-import React, { useContext, useMemo, useCallback } from 'react';
+import React from 'react';
 import {
   AccessibilityActionEvent,
   StyleSheet,
@@ -12,7 +12,7 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 
 import { xs } from '@styles/space';
 import AppIcon from '@icons/AppIcon';
-import StyleContext from '@styles/StyleContext';
+import StyleContext, { StyleContextType } from '@styles/StyleContext';
 
 interface Props {
   count: number;
@@ -34,41 +34,36 @@ interface Props {
   showZeroCount?: boolean;
 }
 
-export default function PlusMinusButtons({
-  count,
-  onIncrement,
-  onDecrement,
-  max,
-  min,
-  style,
-  size = 36,
-  disabled,
-  disablePlus,
-  color,
-  noFill,
-  allowNegative,
-  countRender,
-  hideDisabledMinus,
-  dialogStyle,
-  rounded,
-  showZeroCount,
-}: Props
-) {
-  const { colors, typography } = useContext(StyleContext);
-  const incrementEnabled = !!(!(count === null || (max && (count === max)) || disabled || disablePlus || max === 0) && onIncrement);
-  const decrementEnabled = !!((count > (min || 0) || allowNegative) && !disabled && !!onDecrement);
-  const disabledColor = useMemo(() => {
+export default class PlusMinusButtons extends React.PureComponent<Props> {
+  static contextType = StyleContext;
+  context!: StyleContextType;
+
+  disabledColor() {
+    const {
+      color,
+    } = this.props;
+    const { colors } = this.context;
     switch (color) {
       case 'dark': return colors.lightText;
       case 'light': return colors.lightText;
       case 'white': return 'white';
       default: return colors.M;
     }
-  }, [colors, color]);
-  const roundedColor = useMemo(() => {
+  }
+  roundedColor() {
+    const {
+      color,
+    } = this.props;
+    const { colors } = this.context;
     return color === 'light' ? '#39485240' : colors.L15;
-  }, [color, colors]);
-  const enabledColor = useMemo(() => {
+  }
+  enabledColor() {
+    const {
+      color,
+      rounded,
+      dialogStyle,
+    } = this.props;
+    const { colors } = this.context;
     if (dialogStyle) {
       if (rounded) {
         switch (color) {
@@ -89,30 +84,39 @@ export default function PlusMinusButtons({
       case 'white': return 'white';
       default: return colors.lightText;
     }
-  }, [color, rounded, dialogStyle, colors]);
+  }
 
-  const plusButton = useMemo(() => {
+  renderPlusButton() {
+    const {
+      noFill,
+      onIncrement,
+      color,
+      dialogStyle,
+      rounded,
+    } = this.props;
+    const { colors } = this.context;
+    const size = (this.props.size || 36);
     const width = rounded ? 40 : size * 0.8;
-    if (incrementEnabled) {
+    if (this.incrementEnabled()) {
       return (
         <TouchableOpacity onPress={onIncrement}>
           <View
             style={[
               dialogStyle ? { width, height: width } : undefined,
-              rounded ? { flexDirection: 'row', justifyContent: 'center', alignItems: 'center', borderRadius: 20, backgroundColor: roundedColor } : undefined,
+              rounded ? { flexDirection: 'row', justifyContent: 'center', alignItems: 'center', borderRadius: 20, backgroundColor: this.roundedColor() } : undefined,
             ]}
           >
             { dialogStyle ? (
               <AppIcon
                 name="plus-button"
                 size={rounded ? 36 : 28}
-                color={enabledColor}
+                color={this.enabledColor()}
               />
             ) : (
               <MaterialCommunityIcons
                 name={noFill ? 'plus-box-outline' : 'plus-box'}
                 size={size}
-                color={enabledColor}
+                color={this.enabledColor()}
               />
             ) }
           </View>
@@ -143,34 +147,67 @@ export default function PlusMinusButtons({
             <MaterialCommunityIcons
               name="plus-box-outline"
               size={size}
-              color={disabledColor}
+              color={this.disabledColor()}
             />
           ) }
         </View>
       </TouchableOpacity>
     );
-  }, [onIncrement, noFill, color, dialogStyle, rounded, size, disabledColor, enabledColor, roundedColor, incrementEnabled, colors]);
+  }
 
-  const minusButton = useMemo(() => {
+  incrementEnabled() {
+    const {
+      count,
+      max,
+      disabled,
+      disablePlus,
+      onIncrement,
+    } = this.props;
+    const atMax = max && (count === max);
+    return !(count === null || atMax || disabled || disablePlus || max === 0) && onIncrement;
+  }
+
+  decrementEnabled() {
+    const {
+      count,
+      disabled,
+      allowNegative,
+      min,
+      onDecrement,
+    } = this.props;
+    return (count > (min || 0) || allowNegative) && !disabled && !!onDecrement;
+  }
+
+  renderMinusButton() {
+    const {
+      noFill,
+      onDecrement,
+      color,
+      hideDisabledMinus,
+      dialogStyle,
+      rounded,
+    } = this.props;
+    const { colors } = this.context;
+    const size = (this.props.size || 36);
     const width = rounded ? 40 : size * 0.8;
-    if (decrementEnabled) {
+    if (this.decrementEnabled()) {
       return (
         <TouchableOpacity onPress={onDecrement}>
           <View style={[
             dialogStyle ? { width, height: width } : undefined,
-            rounded ? { flexDirection: 'row', justifyContent: 'center', alignItems: 'center', borderRadius: 20, backgroundColor: roundedColor } : undefined,
+            rounded ? { flexDirection: 'row', justifyContent: 'center', alignItems: 'center', borderRadius: 20, backgroundColor: this.roundedColor() } : undefined,
           ]}>
             { dialogStyle ? (
               <AppIcon
                 name="minus-button"
                 size={rounded ? 36 : 28}
-                color={enabledColor}
+                color={this.enabledColor()}
               />
             ) : (
               <MaterialCommunityIcons
                 name={noFill ? 'minus-box-outline' : 'minus-box'}
                 size={size}
-                color={enabledColor}
+                color={this.enabledColor()}
               />
             ) }
           </View>
@@ -200,30 +237,33 @@ export default function PlusMinusButtons({
             <MaterialCommunityIcons
               name="minus-box-outline"
               size={size}
-              color={disabledColor}
+              color={this.disabledColor()}
             />
           )}
         </View>
       </TouchableOpacity>
     );
-  }, [onDecrement, noFill, color, hideDisabledMinus, dialogStyle, rounded, size, decrementEnabled, enabledColor, disabledColor, roundedColor, colors]);
+  }
 
-  const accessibilityActions = useMemo(() => {
+  accessibilityActions() {
     return flatten([
-      decrementEnabled ? [{ name: 'decrement' }] : [],
-      incrementEnabled ? [{ name: 'increment' }] : [],
+      this.decrementEnabled() ? [{ name: 'decrement' }] : [],
+      this.incrementEnabled() ? [{ name: 'increment' }] : [],
     ]);
-  }, [decrementEnabled, incrementEnabled]);
+  }
 
-  const onAccessibilityAction = useCallback((event: AccessibilityActionEvent) => {
+  _onAccessibilityAction = (event: AccessibilityActionEvent) => {
+    const { onIncrement, onDecrement } = this.props;
     if (event.nativeEvent.actionName === 'increment') {
       onIncrement && onIncrement();
     } else if (event.nativeEvent.actionName === 'decrement') {
       onDecrement && onDecrement();
     }
-  }, [onIncrement, onDecrement]);
+  };
 
-  const countBlock = useMemo(() => {
+  countBlock() {
+    const { countRender, rounded, count, dialogStyle, allowNegative, showZeroCount } = this.props;
+    const { typography } = this.context;
     if (countRender) {
       return countRender;
     }
@@ -245,20 +285,23 @@ export default function PlusMinusButtons({
       );
     }
     return null;
-  }, [countRender, rounded, count, dialogStyle, allowNegative, showZeroCount, typography]);
+  }
 
-  return (
-    <View
-      style={style || styles.row}
-      accessibilityValue={{ min, max, now: count }}
-      accessibilityActions={accessibilityActions}
-      onAccessibilityAction={onAccessibilityAction}
-    >
-      { minusButton }
-      { countBlock }
-      { plusButton }
-    </View>
-  );
+  render() {
+    const { min, max, count } = this.props;
+    return (
+      <View
+        style={this.props.style || styles.row}
+        accessibilityValue={{ min, max, now: count }}
+        accessibilityActions={this.accessibilityActions()}
+        onAccessibilityAction={this._onAccessibilityAction}
+      >
+        { this.renderMinusButton() }
+        { this.countBlock() }
+        { this.renderPlusButton() }
+      </View>
+    );
+  }
 }
 
 const styles = StyleSheet.create({

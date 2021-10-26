@@ -188,9 +188,6 @@ function EmailSubmitForm({ mode, setMode, backPressed, loginSucceeded }: {
   }, [password, emailAddress]);
 
   const submitEmail = useCallback(() => {
-    if (!emailAddress || !password) {
-      return;
-    }
     setSubmitting(true);
     const promise = mode === 'create' ?
       auth().createUserWithEmailAndPassword(emailAddress, password) :

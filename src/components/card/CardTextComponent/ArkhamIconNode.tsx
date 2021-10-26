@@ -45,7 +45,6 @@ const ALL_ICONS = new Set([
   'guide_bullet',
   'curse',
   'bless',
-  'frost',
 ]);
 export default function ArkhamIconNode(usePingFang: boolean, { colors, fontScale }: StyleContextType, sizeScale: number) {
   return (

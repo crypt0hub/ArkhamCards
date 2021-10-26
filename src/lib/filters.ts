@@ -1,4 +1,4 @@
-import { findIndex, forEach, map, partition } from 'lodash';
+import { findIndex, forEach, map } from 'lodash';
 
 import { QueryParams } from '@data/sqlite/types';
 import { BASIC_QUERY, combineQueries, combineQueriesOpt, where } from '@data/sqlite/query';
@@ -218,7 +218,7 @@ export const defaultFilterState: FilterState = {
 
 
 export const VENGEANCE_FILTER: Brackets = where('c.vengeance >= 0 or linked_card.vengeance >= 0');
-export const UNIQUE_FILTER: Brackets = where('c.is_unique = 1');
+export const UNIQUE_FILTER: Brackets = where('c.is_unique = true');
 
 export default class FilterBuilder {
   prefix: string;
@@ -279,17 +279,11 @@ export default class FilterBuilder {
   }
 
   slotFilter(slots: string[]): Brackets[] {
-    const [none, otherSlots] = partition(slots, s => s === 'none');
-    const clause: Brackets[] = this.complexVectorClause(
+    return this.complexVectorClause(
       'slot',
-      map(otherSlots, slot => `%#${slot}#%`),
+      map(slots, slot => `%#${slot}#%`),
       (valueName: string) => `c.real_slots_normalized LIKE :${valueName}`
     );
-    if (!none.length) {
-      return clause;
-    }
-    const noneClause: Brackets = where(`c.real_slots_normalized is null AND c.type_code = 'asset' and NOT c.permanent`);
-    return [combineQueries(noneClause, clause, 'or')];
   }
 
   traitFilter(traits: string[], localizedTraits: boolean): Brackets[] {
@@ -591,10 +585,10 @@ export default class FilterBuilder {
       result.push(where(`c.real_text LIKE '%exile%' or linked_card.real_text LIKE '%exile%'`));
     }
     if (unique) {
-      result.push(where('(c.is_unique = 1 OR linked_card.is_unique = 1) AND c.type_code != "enemy"'));
+      result.push(where('(c.is_unique = true OR linked_card.is_unique = true) AND c.type_code != "enemy"'));
     }
     if (seal) {
-      result.push(where(`c.seal = 1 or linked_card.seal = 1`));
+      result.push(where(`c.seal = true or linked_card.seal = true`));
     }
     if (myriad) {
       result.push(where(`c.real_text LIKE '%Myriad.%' or linked_card.real_text LIKE '%Myriad.%'`));

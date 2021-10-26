@@ -50,8 +50,7 @@ export function getAccessToken() {
           return refresh(config, data.refreshToken)
             .then(
               saveAuthResponse,
-              (e) => {
-                console.log(e.message || e);
+              () => {
                 // Null token will produce an error where it is used.
                 return null;
               });

@@ -1,4 +1,4 @@
-import { useContext, useEffect, useReducer } from 'react';
+import { useContext, useEffect, useMemo, useState } from 'react';
 import { Brackets } from 'typeorm/browser';
 import { filter } from 'lodash';
 
@@ -13,30 +13,17 @@ interface Props {
   tabooSetOverride?: number;
 }
 
-interface CardState {
-  cards: Card[];
-  loading: boolean;
-}
-
 export default function useCardsFromQuery({ query, sort, tabooSetOverride }: Props): [Card[], boolean] {
   const tabooSetId = useTabooSetId(tabooSetOverride);
   const { db } = useContext(DatabaseContext);
-  const [{ cards, loading }, updateCards] = useReducer((state: CardState, cards: Card[]) => {
-    return {
-      cards,
-      loading: false,
-    };
-  }, {
-    cards: [],
-    loading: true,
-  });
+  const [cards, setCards] = useState<Card[] | undefined>(query ? [] : undefined);
   useEffect(() => {
     let canceled = false;
     if (query) {
       // setCards(undefined);
       db.getCards(query, tabooSetId, sort).then(cards => {
         if (!canceled) {
-          updateCards(filter(cards, card => !!card));
+          setCards(filter(cards, card => !!card));
         }
       });
       return () => {
@@ -44,5 +31,6 @@ export default function useCardsFromQuery({ query, sort, tabooSetOverride }: Pro
       };
     }
   }, [db, query, tabooSetId, sort]);
-  return [cards, loading];
+  const resultCards = useMemo(() => cards || [], [cards]);
+  return [resultCards, cards === undefined];
 }

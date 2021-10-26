@@ -8,20 +8,13 @@ import { FactionCodeType } from '@app_constants';
 import StyleContext from '@styles/StyleContext';
 
 function factionToIconName(faction: FactionCodeType) {
+  if (faction === 'neutral') {
+    return 'elder_sign';
+  }
   if (faction === 'mythos') {
     return 'auto_fail';
   }
   return faction;
-}
-
-function factionSize(faction: FactionCodeType) {
-  if (faction === 'mythos') {
-    return 28;
-  }
-  if (faction === 'neutral') {
-    return 30;
-  }
-  return 32;
 }
 
 interface Props {
@@ -51,11 +44,11 @@ export default function FactionChooser({ onFilterChange, factions, selection }: 
       element: (selected: boolean) => {
         const iconName = factionToIconName(faction);
         return (
-          <View key={faction} style={[styles.icon, (faction === 'mythos') ? { height: 28 } : {}, faction === 'neutral' ? { paddingTop: 3 } : undefined]}>
+          <View key={faction} style={[styles.icon, (faction === 'mythos' || faction === 'neutral') ? { height: 28 } : {}]}>
             <ArkhamIcon
               name={iconName}
-              size={factionSize(faction)}
-              color={selected ? colors.faction[faction].text : colors.M}
+              size={iconName !== faction ? 28 : 32}
+              color={selected ? colors.faction[faction].text : colors.L10}
             />
           </View>
         );

@@ -4,7 +4,6 @@ import Card from '@data/types/Card';
 import { LEAD_INVESTIGATOR_STEP_ID } from '@data/scenario/fixedSteps';
 
 export const SORT_BY_TYPE = 'type';
-export const SORT_BY_CYCLE = 'cycle';
 export const SORT_BY_FACTION = 'faction';
 export const SORT_BY_FACTION_PACK = 'faction_pack';
 export const SORT_BY_FACTION_XP = 'faction_xp';
@@ -573,7 +572,7 @@ export interface SetTabooSetAction {
 export const SET_MISC_SETTING = 'SET_MISC_SETTING';
 export interface SetMiscSettingAction {
   type: typeof SET_MISC_SETTING;
-  setting: 'single_card' | 'alphabetize' | 'colorblind' | 'justify' | 'sort_quotes' | 'ignore_collection' | 'beta1';
+  setting: 'single_card' | 'alphabetize' | 'colorblind' | 'justify' | 'sort_quotes' | 'ignore_collection';
   value: boolean;
 }
 
@@ -637,11 +636,10 @@ export interface CardFetchSuccessAction {
   choiceLang: string;
 }
 
-export const CARD_REQUEST_FETCH = 'CARD_REQUEST_FETCH';
-export interface CardRequestFetchAction {
-  type: typeof CARD_REQUEST_FETCH;
-  cardLang: string;
-  choiceLang: string;
+export const CARD_FETCH_UPDATE_PROGRESS = 'CARD_FETCH_UPDATE_PROGRESS';
+export interface CardFetchUpdateProgressAction {
+  type: typeof CARD_FETCH_UPDATE_PROGRESS;
+  progress: number;
 }
 
 export const CARD_FETCH_ERROR = 'CARD_FETCH_ERROR';

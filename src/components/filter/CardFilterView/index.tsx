@@ -8,7 +8,7 @@ import {
 import { useSelector } from 'react-redux';
 import { c, t } from 'ttag';
 
-import getLocalizedTraits from './getLocalizedTraits';
+import getLcalizedTraits from './getLocalizedTraits';
 import FactionChooser from './FactionChooser';
 import XpChooser from './XpChooser';
 import SkillIconChooser from './SkillIconChooser';
@@ -339,7 +339,7 @@ const CardFilterView = (props: FilterFunctionProps & NavigationProps) => {
   } = props;
   const localizedTraits = useMemo(() => {
     if (!useCardTraits) {
-      return getLocalizedTraits();
+      return getLcalizedTraits();
     }
     return undefined;
   }, [useCardTraits]);
