@@ -40,7 +40,7 @@ export default function ResolutionStepComponent({ step }: Props) {
               { resolution.title }
             </Text>
           </View>
-          { narration && <NarrationInlineControls narration={narration} />}
+          { !!narration && <NarrationInlineControls narration={narration} />}
           { !!resolution.text && (
             <View style={space.marginSideM}>
               <CampaignGuideTextComponent

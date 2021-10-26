@@ -662,7 +662,7 @@ export const getCardFilterData = createSelector(
 );
 
 export const getEnableArkhamCardsAccount = createSelector(
-  (state: AppState) => state.settings.beta1,
+  (state: AppState) => state.settings?.beta1,
   (beta1: undefined | boolean): boolean => {
     return ENABLE_ARKHAM_CARDS_ACCOUNT && (
       (Platform.OS === 'ios' && ENABLE_ARKHAM_CARDS_ACCOUNT_IOS) ||
